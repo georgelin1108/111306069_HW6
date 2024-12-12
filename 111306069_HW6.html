@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>111306069_HW6_1A2B</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #history {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>111306069_HW6_1A2B</h1>
+    <p>請輸入4個不重複的數字：</p>
+    <input type="text" id="guessInput" maxlength="4" placeholder="EX: 1234">
+    <button onclick="submitGuess()">Guess！</button>
+    <div id="history">
+        <h3>歷史紀錄</h3>
+        <ul id="recordList"></ul>
+    </div>
+    
+    <script>
+        let answer = generateAnswer();
+        let attempts = 0;
+
+        function generateAnswer() {
+            const digits = [...Array(10).keys()]; 
+            const answer = [];
+            while (answer.length < 4) {
+                const randomIndex = Math.floor(Math.random() * digits.length);
+                answer.push(digits[randomIndex]);
+                digits.splice(randomIndex, 1); 
+            }
+            return answer;
+        }
+
+        function submitGuess() {
+            const inputField = document.getElementById("guessInput");
+            const guess = inputField.value;
+
+            // 檢查輸入是否正確
+            if (!isValidGuess(guess)) {
+                alert("請輸入4個不重複的數字！");
+                return;
+            }
+
+            attempts++;
+
+            const result = calculate1A2B(guess.split("").map(Number));
+            updateHistory(guess, result);
+
+            if (result.a === 4) {
+                alert(`恭喜答對！答案是 ${answer.join("")}，您總共猜了 ${attempts} 次。`);
+                resetGame();
+            }
+
+            inputField.value = "";
+        }
+
+        function isValidGuess(guess) {
+            if (guess.length !== 4 || isNaN(guess)) return false;
+            const digits = guess.split("");
+            const uniqueDigits = new Set(digits);
+            return uniqueDigits.size === 4; 
+        }
+
+        // 計算 1A2B
+        function calculate1A2B(guess) {
+            let a = 0; 
+            let b = 0; 
+
+            for (let i = 0; i < 4; i++) {
+                if (guess[i] === answer[i]) {
+                    a++;
+                } else if (answer.includes(guess[i])) {
+                    b++;
+                }
+            }
+
+            return { a, b };
+        }
+
+        function updateHistory(guess, result) {
+            const recordList = document.getElementById("recordList");
+            const listItem = document.createElement("li");
+            listItem.textContent = `猜測：${guess} -> ${result.a}A${result.b}B`;
+            recordList.appendChild(listItem);
+        }
+
+        function resetGame() {
+            answer = generateAnswer();
+            attempts = 0;
+            document.getElementById("recordList").innerHTML = "";
+            alert("遊戲重置！可以開始新一輪猜測！");
+        }
+    </script>
+</body>
+</html>
